@@ -285,7 +285,7 @@ void idSoundSample_OpenAL::CreateOpenALBuffer()
 
 	if( CheckALErrors() != AL_NO_ERROR )
 	{
-		// common->Error( "idSoundSample_OpenAL::CreateOpenALBuffer: error generating OpenAL hardware buffer" );
+		common->Error( "idSoundSample_OpenAL::CreateOpenALBuffer: error generating OpenAL hardware buffer" );
 	}
 
 	if( alIsBuffer( openalBuffer ) )
@@ -304,7 +304,7 @@ void idSoundSample_OpenAL::CreateOpenALBuffer()
 
 			if( MS_ADPCM_decode( ( uint8** ) &buffer, &bufferSize ) < 0 )
 			{
-				// common->Error( "idSoundSample_OpenAL::CreateOpenALBuffer: could not decode ADPCM '%s' to 16 bit format", GetName() );
+				common->Error( "idSoundSample_OpenAL::CreateOpenALBuffer: could not decode ADPCM '%s' to 16 bit format", GetName() );
 			}
 
 			buffers[0].buffer = buffer;
@@ -315,12 +315,12 @@ void idSoundSample_OpenAL::CreateOpenALBuffer()
 		else if( format.basic.formatTag == idWaveFile::FORMAT_XMA2 )
 		{
 			// RB: not used in the PC version of the BFG edition
-			// common->Error( "idSoundSample_OpenAL::CreateOpenALBuffer: could not decode XMA2 '%s' to 16 bit format", GetName() );
+			common->Error( "idSoundSample_OpenAL::CreateOpenALBuffer: could not decode XMA2 '%s' to 16 bit format", GetName() );
 		}
 		else if( format.basic.formatTag == idWaveFile::FORMAT_EXTENSIBLE )
 		{
 			// RB: not used in the PC version of the BFG edition
-			// common->Error( "idSoundSample_OpenAL::CreateOpenALBuffer: could not decode extensible WAV format '%s' to 16 bit format", GetName() );
+			common->Error( "idSoundSample_OpenAL::CreateOpenALBuffer: could not decode extensible WAV format '%s' to 16 bit format", GetName() );
 		}
 		else
 		{
@@ -355,7 +355,7 @@ void idSoundSample_OpenAL::CreateOpenALBuffer()
 
 		if( CheckALErrors() != AL_NO_ERROR )
 		{
-//			common->Error( "idSoundSample_OpenAL::CreateOpenALBuffer: error loading data into OpenAL hardware buffer" );
+			common->Error( "idSoundSample_OpenAL::CreateOpenALBuffer: error loading data into OpenAL hardware buffer" );
 		}
 	}
 }
@@ -585,7 +585,7 @@ void idSoundSample_OpenAL::MakeDefault()
 
 	if( CheckALErrors() != AL_NO_ERROR )
 	{
-		// common->Error( "idSoundSample_OpenAL::MakeDefault: error generating OpenAL hardware buffer" );
+		common->Error( "idSoundSample_OpenAL::MakeDefault: error generating OpenAL hardware buffer" );
 	}
 
 	if( alIsBuffer( openalBuffer ) )
@@ -594,7 +594,7 @@ void idSoundSample_OpenAL::MakeDefault()
 		alBufferData( openalBuffer, GetOpenALBufferFormat(), defaultBuffer, totalBufferSize, format.basic.samplesPerSec );
 		if( CheckALErrors() != AL_NO_ERROR )
 		{
-			// common->Error( "idSoundSample_OpenAL::MakeDefault: error loading data into OpenAL hardware buffer" );
+			common->Error( "idSoundSample_OpenAL::MakeDefault: error loading data into OpenAL hardware buffer" );
 		}
 	}
 }
@@ -633,7 +633,7 @@ void idSoundSample_OpenAL::FreeData()
 		alDeleteBuffers( 1, &openalBuffer );
 		if( CheckALErrors() != AL_NO_ERROR )
 		{
-			// common->Error( "idSoundSample_OpenAL::FreeData: error unloading data from OpenAL hardware buffer" );
+			common->Error( "idSoundSample_OpenAL::FreeData: error unloading data from OpenAL hardware buffer" );
 		}
 		else
 		{
