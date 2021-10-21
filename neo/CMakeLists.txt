@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.2)
 
 project(RBDoom3BFG)
 
+SET(OPENALDIR "/usr/local/opt/openal-soft")
+
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 if(CMAKE_MAJOR_VERSION EQUAL 3 AND CMAKE_MINOR_VERSION GREATER_EQUAL 6)
@@ -1700,7 +1702,9 @@ else()
 			${SDL_INCLUDES} ${SDL_SOURCES})
 			
 		if(OPENAL)
-			find_package(OpenAL REQUIRED)
+			# find_package(OpenAL REQUIRED)
+			SET(OPENAL_INCLUDE_DIR "/usr/local/opt/openal-soft/include")
+			SET(OPENAL_LIBRARY "/usr/local/opt/openal-soft/lib/libopenal.dylib")
 			add_definitions(-DUSE_OPENAL)
    
             # SRS - Added support for OpenAL Soft headers on OSX (vs default macOS SDK headers)
