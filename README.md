@@ -314,6 +314,10 @@ Left: No global illumination. Ambient is pitch black like in original Doom 3. Ri
 
 <img src="https://i.imgur.com/KESmZld.png" width="384"> <img src="https://i.imgur.com/lHc7Pb9.png" width="384">
 
+<img src="https://i.imgur.com/qIq1xPi.png" width="384"> <img src="https://i.imgur.com/tGoceNP.png" width="384">
+
+<img src="https://i.imgur.com/45YCeSf.png" width="384"> <img src="https://i.imgur.com/GBDbml1.png" width="384">
+
 Some examples that show additional environment lighting on all assets.
 
 <img src="https://i.imgur.com/xBPa2Y8.png" width="384"> <img src="https://i.imgur.com/MCjwFE7.png" width="384">
@@ -380,11 +384,12 @@ Here is an overview of the changes made to TrenchBroom:
 * Game FGDs for Doom 3 and Doom 3 BFG
 
 ***Issues***
-* D3Radiant usually does not allow to use just textures. Only valid materials work and only materials should be shown in the texture collection overview. However this branch still displays all found textures.
 * It has no support for BFG .resource files and .bimage files. BFG only shipped for precompressed textures and no .tga files so people who want to mod for BFG have to copy the vanilla D3 base/textures/* and base/models/* to D3BFG/base/
-* Many entities work differently in Doom 3 if they have an origin. Brush work in D3 is usually stored in entity space and not world space. This is a major issue and not solved. I couldn't figure out how to parse the origin first and then translate the brushes accordingly.
+* Many entities work differently in Doom 3 if they have an origin. Brush work in D3 is usually stored in entity space and not world space. This is a major issue. For new maps textures/common/origin has been reintroduced in the engine like in former times
 * Doom 3's primary model formats are LWO and ASE. LWO and .md5mesh model support is missing.
 * Some ASE models can't be loaded and materials are usually all wrong if loaded
+* TrenchBroom doesn't support the "rotation" keyword and many models have the wrong orientation
+* The custom TrenchBroom build breaks compatibility for other id Tech engines, e.g. entity links work between "target[num]" and "name" and not "targetname"
 
 ### Some Scenes of Mars City 1 loaded into TrenchBroom
 <img src="https://i.imgur.com/nqR04z8.jpg" width="384"> <img src="https://i.imgur.com/GxL1X02.jpg" width="384">
@@ -666,7 +671,7 @@ Name                                   | Description
 r_antiAliasing                         | Different Anti-Aliasing modes
 r_useShadowMapping [0 or 1]            | Use soft shadow mapping instead of hard stencil shadows
 r_hdrAutoExposure [0 or 1]             | Adaptive tonemapping with HDR. This allows to have very bright or very dark scenes but the camera will adapt to it so the scene won't loose details
-r_exposure [0 .. 1]                    | Default 0.5, Controls brightness and affects HDR exposure key. This is what you change in the video brightness options
+r_exposure [0 .. 1]                    | Default 0.5, Controls brightness and affects HDR -> sRGB Rec. 709 exposure key. This is what you change in the video brightness options
 r_useSSAO [0 .. 1]                     | Use Screen Space Ambient Occlusion to darken the corners in the scene
 r_useFilmicPostProcessing [0, 1]       | Apply several post process effects to mimic a filmic look
 
@@ -727,10 +732,10 @@ You can find your qconsole.log on Windows in C:\Users\<your user name>\Saved Gam
 # FAQ <a name="faq"></a>
 
 **Q**: Why bother with DOOM-3-BFG in 2021?
-**A**: It is fun, period. Doom 3 was an impressive milestone in total game development in 2004. In 2011 id Software added lot stuff from the development of Rage like its own Flash SWF and ActionScript 2 interpreter, proper support for gamepads and widescreens. It also combines the gamecode for D3 and its missionpacks and runs it in a seperate thread and it has many multithreaded rendering optimizations. 
+**A**: It is fun, period. Doom 3 was an impressive milestone in total game development in 2004. In 2011 id Software added lot stuff from the development of Rage like its own Flash SWF and ActionScript 2 interpreter, proper support for gamepads and widescreens. It also combines the gamecode for Doom 3 and its missionpacks and runs it in a seperate thread and it has many multithreaded rendering optimizations. 
 DOOM-3 and DOOM-3-BFG are some of the most transparent games available where you can open all files and inspect how the game was built.
 Unlike Quake 1-3, DOOM-3-BFG shipped with all level .map sources for 47 single player maps.
-There is plenty of stuff to learn from it like solid run & gun core gameplay, AI, animations, client/server multiplayer, level design or simple and elegant engine design.
+There is plenty of stuff you can learn from it like solid run & gun core gameplay, AI, animations, client/server multiplayer, level design or simple and elegant engine design.
 
 **Q**: Can I use this engine to make a commercial game?
 **A**: You can but don't bother me to give you free support and you probably should use Unreal Engine 4. I am a full time game developer and usually don't have time for any free support.
@@ -739,7 +744,7 @@ However some people already work on total conversions and there is a community o
 https://discord.gg/Q3E9rUFnnP
 
 **Q**: How do I know what code you've changed?
-**A**: Apart from the Git diffs, you can look for `// RB` in the source code. Many other contributors commented their changes in the same way. I enforced the usage of Astyle in this project which also makes it alot easier to compare it against other ports of DOOM-3-BFG. Simply format the other ports with Astyle like I do in neo/astyle-code.bat and you can compare the code easily in WinMerge or KDiff3.
+**A**: Apart from the Git log diffs, you can look for `// RB` in the source code. Many other contributors commented their changes in the same way. I enforced the usage of Astyle in this project which also makes it alot easier to compare it against other ports of DOOM-3-BFG. Simply format the other ports with Astyle like I do in neo/astyle-code.bat and you can compare the code easily in WinMerge or KDiff3.
 
 **Q**: How do I open the .resource files?
 **A**: If you install this package you can start the engine, open the console and run exec extract_resources.cfg. This will create a basedev/ folder next to your base/ folder with the indidividual files like .mtr materials or .def entity declarations.
