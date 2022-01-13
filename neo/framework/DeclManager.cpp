@@ -263,6 +263,7 @@ private:
 	// RB begin
 	static void                 ExportDeclsToBlender_f( const idCmdArgs& args );
 	static void                 ExportDeclsToTrenchBroom_f( const idCmdArgs& args );
+	static void                 ExportModelsToTrenchBroom_f( const idCmdArgs& args );
 	// RB end
 };
 
@@ -960,6 +961,7 @@ void idDeclManagerLocal::Init()
 	// RB begin
 	cmdSystem->AddCommand( "exportEntityDefsToBlender", ExportDeclsToBlender_f, CMD_FL_SYSTEM, "exports all entity and model defs to exported/entities.json" );
 	cmdSystem->AddCommand( "exportFGD", ExportDeclsToTrenchBroom_f, CMD_FL_SYSTEM, "exports all entity and model defs to exported/_tb/Doom3.fgd" );
+	cmdSystem->AddCommand( "exportModelsToTrenchBroom", ExportModelsToTrenchBroom_f, CMD_FL_SYSTEM, "exports all generated models like blwo, base .. to _tb/*.obj" );
 	// RB end
 
 	common->Printf( "------------------------------\n" );
@@ -2164,6 +2166,7 @@ void idDeclManagerLocal::ExportDeclsToTrenchBroom_f( const idCmdArgs& args )
 	solidClassNames.AddUnique( "func_plat" );
 	solidClassNames.AddUnique( "func_rotating" );
 	solidClassNames.AddUnique( "func_splinemover" );
+	solidClassNames.AddUnique( "func_static" );
 	solidClassNames.AddUnique( "moveable_base" );
 	solidClassNames.AddUnique( "trigger_" );
 
@@ -2628,6 +2631,27 @@ void idDeclManagerLocal::ExportDeclsToTrenchBroom_f( const idCmdArgs& args )
 			file->Printf( "= %s : \"%s\"\n", decl->GetName(), text.c_str() );
 			file->Printf( "[\n" );
 
+			if( idStr::Icmp( decl->GetName(), "light" ) == 0 )
+			{
+				// RB: hardcode for now to have proper light styles combobox names
+				file->Printf(
+					"\tstyle(Choices) : \"Appearance\" : 0 =\n"
+					"\t[\n"
+					"\t\t0 : \"Normal\"\n"
+					"\t\t10: \"Fluorescent flicker\"\n"
+					"\t\t2 : \"Slow, strong pulse\"\n"
+					"\t\t11: \"Slow pulse, noblack\"\n"
+					"\t\t5 : \"Gentle pulse\"\n"
+					"\t\t1 : \"Flicker A\"\n"
+					"\t\t6 : \"Flicker B\"\n"
+					"\t\t3 : \"Candle A\"\n"
+					"\t\t7 : \"Candle B\"\n"
+					"\t\t8 : \"Candle C\"\n"
+					"\t\t4 : \"Fast strobe\"\n"
+					"\t\t9 : \"Slow strobe\"\n"
+					"\t]\n" );
+			}
+
 			for( int i = 0; i < dictToWrite.GetNumKeyVals(); i++ )
 			{
 				kv = dictToWrite.GetKeyVal( i );
@@ -2727,6 +2751,64 @@ void idDeclManagerLocal::ExportDeclsToTrenchBroom_f( const idCmdArgs& args )
 	}
 
 	//declManagerLocal.Reload( true );
+	common->FatalError( "Exporting successful, need to restart manually" );
+}
+
+
+void idDeclManagerLocal::ExportModelsToTrenchBroom_f( const idCmdArgs& args )
+{
+	extern idCVar postLoadExportModels;
+	postLoadExportModels.SetBool( true );
+
+	// avoid media cache
+	com_editors |= EDITOR_EXPORTDEFS;
+
+	int totalModelsCount = 0;
+
+	idFileList* files = fileSystem->ListFilesTree( "generated", ".blwo|.base|.bmd5mesh", true, true );
+
+	for( int f = 0; f < files->GetList().Num(); f++ )
+	{
+		idStr modelName = files->GetList()[ f ];
+		modelName.StripLeadingOnce( "generated/rendermodels/" );
+
+		idStr ext;
+		modelName.ExtractFileExtension( ext );
+
+		if( ext.Icmp( "blwo" ) == 0 )
+		{
+			modelName.SetFileExtension( "lwo" );
+		}
+
+		if( ext.Icmp( "base" ) == 0 )
+		{
+			modelName.SetFileExtension( "ase" );
+		}
+
+		if( ext.Icmp( "bdae" ) == 0 )
+		{
+			modelName.SetFileExtension( "dae" );
+		}
+
+		if( ext.Icmp( "bmd5mesh" ) == 0 )
+		{
+			modelName.SetFileExtension( "md5mesh" );
+		}
+
+		idLib::Printf( "Exporting model '%s'\n", modelName.c_str() );
+
+		renderModelManager->FindModel( modelName );
+
+		totalModelsCount++;
+	}
+	fileSystem->FreeFileList( files );
+
+	com_editors &= ~EDITOR_EXPORTDEFS;
+	postLoadExportModels.SetBool( false );
+
+	common->Printf( "----------------------------\n" );
+	common->Printf( "Wrote %d Models.\n", totalModelsCount );
+
 	common->FatalError( "Exporting successful, need to restart manually" );
 }
 // RB  end
