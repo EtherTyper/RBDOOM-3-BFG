@@ -15,27 +15,45 @@ Thank you for downloading RBDOOM-3-BFG.
 
 _______________________________________
 
-TBD - RBDOOM-3-BFG 1.3.1
+TBD - RBDOOM-3-BFG 1.4.0
 _______________________________
 
+## .plan
 
-## General Changelog
+This version improves support for mapping with TrenchBroom. Until now you needed to extract and copy the vanilla Doom 3 models and textures over to the base/ folder to see the content in the TrenchBroom entity browser and texture viewer.
+Owning the original game next to the BFG edition is not necessary anymore.
+This version comes with a couple of new console commands that lets you export particular parts of the .resources files to the base/_tb/ folder.
+You need to call exportImagesToTrenchBroom and exportModelsToTrenchBroom once and you are good to go to start mapping with the TrenchBroom level editor.
+
+## Changelog
 
 [TRENCHBROOM]
 
 * Tweaked exportFGD command for new icons
 
-* Added console command convertMapToValve220 `<map>`
+* Added new icons to TrenchBroom for certain entities like lights, speakers or particle emitters
+
+* TrenchBroom offers a dropdown menu to select the Quake 1 light style for lights
+
+* Drastically improved loading time of textures for materials in TrenchBroom
+
+* Added RBDoom console command convertMapToValve220 `<map>`
+
+* Added RBDoom console command exportImagesToTrenchBroom which decompresses and saves all .bimage images to _tb/*.png files
+
+* Added RBDoom console command exportModelsToTrenchBroom which saves all .base|.blwo|.bmd5mesh models to _tb/*.obj files
 
 [MISCELLANEOUS]
 
 * Added CMake options STANDALONE and DOOM_CLASSIC
 
-* Added CMake options STANDALONE and DOOM_CLASSIC
-
 [ASSETS]
 
-* 
+* Added TrenchBroom helper entityDefs like a Quake 3 style misc_model to comply with TrenchBroom's Solid/PointClass rules for editing entities
+
+* Added new Creative Commons CC0 textures/common/ and textures/editor/ replacement textures because they didn't ship with the BFG edition
+
+* Added base/convert_maps_to_valve220.cfg which lets you convert all maps to the Valve 220 .map format in one shot
 
 _______________________________________
 

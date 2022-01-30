@@ -134,7 +134,7 @@ inline bool BrushPrimitive_Degenerate( const idVec3& bpTexMatX, const idVec3& bp
 }
 
 // heavily inspired by Valve220_from_BP from Netradiant-custom
-void idMapBrushSide::ConvertToValve220Format( const idMat4& entityTransform )
+void idMapBrushSide::ConvertToValve220Format( const idMat4& entityTransform, idStrList& textureCollections )
 {
 	// create p1, p2, p3
 	idVec3 forward = plane.Normal();
@@ -193,7 +193,7 @@ void idMapBrushSide::ConvertToValve220Format( const idMat4& entityTransform )
 		texValve[i].Normalize();
 	}
 
-	//material = "enpro/enwall16";
+	idMapFile::AddMaterialToCollection( GetMaterial(), textureCollections );
 
 	const idMaterial* material = declManager->FindMaterial( GetMaterial() );
 
@@ -2776,6 +2776,7 @@ bool idMapFile::ConvertToValve220Format()
 	valve220Format = true;
 
 	idDict classTypeOverview;
+	idStrList textureCollections;
 
 	int count = GetNumEntities();
 	for( int j = 0; j < count; j++ )
@@ -2784,11 +2785,6 @@ bool idMapFile::ConvertToValve220Format()
 		if( ent )
 		{
 			idStr classname = ent->epairs.GetString( "classname" );
-
-			if( idStr::Icmp( classname, "worldspawn" ) == 0 )
-			{
-				ent->epairs.Set( "_tb_textures", "textures/common;textures/editor;textures/decals;textures/decals2" );
-			}
 
 			// build entity transform
 			idVec3 origin;
@@ -2880,8 +2876,13 @@ bool idMapFile::ConvertToValve220Format()
 						for( int s = 0; s < brushPrim->GetNumSides(); s++ )
 						{
 							idMapBrushSide* side = brushPrim->GetSide( s );
-							side->ConvertToValve220Format( transform );
+							side->ConvertToValve220Format( transform, textureCollections );
 						}
+					}
+					else if( mapPrim->GetType() == idMapPrimitive::TYPE_PATCH )
+					{
+						idMapPatch* patch = static_cast<idMapPatch*>( mapPrim );
+						idMapFile::AddMaterialToCollection( patch->GetMaterial(), textureCollections );
 					}
 				}
 
@@ -2904,11 +2905,26 @@ bool idMapFile::ConvertToValve220Format()
 			{
 				// just a regular entity
 
+				// TrenchBroom doesn't allow models for SolidClasses so use helper classes instead
 				if( idStr::Icmp( classname, "func_static" ) == 0 && idStr::Icmp( model.c_str(), classname.c_str() ) != 0 )
 				{
-					// TrenchBroom doesn't allow models for SolidClasses
-					// use Quake 3 style misc_model helper class instead
 					ent->epairs.Set( "classname", "misc_model" );
+				}
+				else if( idStr::Icmp( classname, "func_door" ) == 0 && idStr::Icmp( model.c_str(), classname.c_str() ) != 0 )
+				{
+					ent->epairs.Set( "classname", "func_door_model" );
+				}
+				else if( idStr::Icmp( classname, "func_mover" ) == 0 && idStr::Icmp( model.c_str(), classname.c_str() ) != 0 )
+				{
+					ent->epairs.Set( "classname", "func_mover_amodel" );
+				}
+				else if( idStr::Icmp( classname, "func_rotating" ) == 0 && idStr::Icmp( model.c_str(), classname.c_str() ) != 0 )
+				{
+					ent->epairs.Set( "classname", "func_rotating_model" );
+				}
+				else if( idStr::Icmp( classname, "func_plat" ) == 0 && idStr::Icmp( model.c_str(), classname.c_str() ) != 0 )
+				{
+					ent->epairs.Set( "classname", "func_plat_model" );
 				}
 
 				// replace "rotation" with angles because it is not supported by TrenchBroom
@@ -2934,6 +2950,26 @@ bool idMapFile::ConvertToValve220Format()
 				}
 			}
 		}
+	}
+
+	idMapEntity* worldspawn = GetEntity( 0 );
+	if( worldspawn )
+	{
+		//worldspawn->epairs.Set( "_tb_textures", "textures/common;textures/editor;textures/decals;textures/decals2" );
+
+		idStr list;
+		for( int i = 0; i < textureCollections.Num(); i++ )
+		{
+			list += textureCollections[ i ];
+
+			if( i != ( textureCollections.Num() - 1 ) )
+			{
+				list += ";";
+			}
+		}
+
+		worldspawn->epairs.Set( "_tb_textures", list );
+		worldspawn->epairs.Set( "_tb_def", "builtin:DOOM-3-all.fgd" );
 	}
 
 	int n = classTypeOverview.GetNumKeyVals();
@@ -2972,6 +3008,17 @@ bool idMapFile::ConvertToValve220Format()
 	}
 
 	return true;
+}
+
+void idMapFile::AddMaterialToCollection( const char* material, idStrList& textureCollections )
+{
+	idStr withoutPath = material;
+	withoutPath.StripPath();
+
+	idStr textureCollection = material;
+	textureCollection.StripTrailingOnce( "/" + withoutPath );
+
+	textureCollections.AddUnique( textureCollection );
 }
 
 // RB end
