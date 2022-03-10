@@ -78,6 +78,7 @@ static VkFormat VK_GetFormatFromTextureFormat( const textureFormat_t format )
 		case FMT_DXT5:
 			return VK_FORMAT_BC3_UNORM_BLOCK;
 		case FMT_DEPTH:
+		case FMT_DEPTH_STENCIL:
 			return vkcontext.depthFormat;
 		case FMT_X16:
 			return VK_FORMAT_R16_UNORM;
@@ -491,17 +492,6 @@ void idImage::CopyDepthbuffer( int x, int y, int imageWidth, int imageHeight )
 
 }
 
-
-
-/*
-========================
-idImage::SetPixel
-========================
-*/
-void idImage::SetPixel( int mipLevel, int x, int y, const void* data, int dataSize )
-{
-	SubImageUpload( mipLevel, x, y, 0, 1, 1, data );
-}
 
 /*
 ========================
